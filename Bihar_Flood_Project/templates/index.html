@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>FloodIQ · Delhi Flood Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M2 12 Q6 4 12 8 Q18 4 22 12 Q18 20 12 16 Q6 20 2 12Z" fill="#6366f1"/>
+        <circle cx="12" cy="12" r="3" fill="white"/>
+      </svg>
+    </div>
+    <span class="sb-logo-text">FloodIQ</span>
+  </div>
+
+  <p class="sb-section">MAIN NAVIGATION</p>
+  <nav>
+    <a class="sb-link" href="#"><svg class="sb-ico" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="currentColor" opacity=".6"/><rect x="14" y="3" width="7" height="7" rx="1.5" fill="currentColor" opacity=".6"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="currentColor" opacity=".6"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="currentColor" opacity=".6"/></svg>Dashboard</a>
+    <a class="sb-link active" href="#"><svg class="sb-ico" viewBox="0 0 24 24" fill="none"><path d="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z" fill="currentColor"/></svg>Analytics</a>
+    <a class="sb-link" href="#"><svg class="sb-ico" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>Alerts<span class="sb-badge">4</span></a>
+    <a class="sb-link" href="#"><svg class="sb-ico" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Simulation</a>
+    <a class="sb-link" href="#"><svg class="sb-ico" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 2v4M16 2v4M3 10h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Ward Reports</a>
+    <a class="sb-link" href="#"><svg class="sb-ico" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/></svg>Resources</a>
+  </nav>
+
+  <p class="sb-section" style="margin-top:8px">SUPPORT</p>
+  <nav>
+    <a class="sb-link" href="#"><svg class="sb-ico" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v1a2 2 0 010 4v1M12 17v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Help Center</a>
+    <a class="sb-link" href="#"><svg class="sb-ico" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Settings</a>
+  </nav>
+
+  <div class="sb-user">
+    <div class="sb-avatar">DC</div>
+    <div>
+      <div class="sb-uname">Delhi Control</div>
+      <div class="sb-urole">@floodiq.ndmc</div>
+    </div>
+    <div class="sb-online"></div>
+  </div>
+</aside>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div>
+      <h1 class="tb-title">Analytics</h1>
+      <p class="tb-sub">Want to see about: <span class="tb-link" onclick="runAnalysis()">Delhi Wards ▾</span></p>
+    </div>
+    <div class="tb-right">
+      <div class="date-group">
+        <button class="dpill active">7 Days</button>
+        <button class="dpill">1 Month</button>
+        <button class="dpill">3 Months</button>
+        <button class="dpill">📅 Mar 08, 2026</button>
+      </div>
+      <button class="btn-cta" id="topAnalyzeBtn" onclick="runAnalysis()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="2"/><path d="M10 8l6 4-6 4V8z" fill="white"/></svg>
+        Analyze Risk
+      </button>
+      <div class="tb-avatar">DC</div>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <div class="page">
+
+    <!-- ▓▓ ROW 1 — 4 STAT CARDS ▓▓ -->
+    <div class="row-stats">
+
+      <div class="stat-card">
+        <div class="sc-head">
+          <div class="sc-icon c-indigo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="#6366f1" opacity=".8"/><rect x="14" y="3" width="7" height="7" rx="1.5" fill="#6366f1" opacity=".8"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="#6366f1" opacity=".8"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="#6366f1" opacity=".8"/></svg></div>
+          <span class="sc-dots">···</span>
+        </div>
+        <div class="sc-num" id="s1">10</div>
+        <div class="sc-label">Total Wards</div>
+        <div class="sc-badge green" id="s1b">✓ AI Model Active</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="sc-head">
+          <div class="sc-icon c-purple"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="#8b5cf6" stroke-width="2"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <span class="sc-dots">···</span>
+        </div>
+        <div class="sc-num" id="s2">—</div>
+        <div class="sc-label">People at Risk</div>
+        <div class="sc-badge red" id="s2b">↑ Run analysis</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="sc-head">
+          <div class="sc-icon c-red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#ef4444" stroke-width="1.8"/><path d="M12 9v4M12 17h.01" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <span class="sc-dots">···</span>
+        </div>
+        <div class="sc-num" id="s3">—</div>
+        <div class="sc-label">High Risk Wards</div>
+        <div class="sc-badge red" id="s3b">↑ —</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="sc-head">
+          <div class="sc-icon c-teal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#14b8a6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <span class="sc-dots">···</span>
+        </div>
+        <div class="sc-num" id="s4">—</div>
+        <div class="sc-label">Avg Readiness</div>
+        <div class="sc-badge green" id="s4b">↑ —</div>
+      </div>
+
+    </div>
+
+    <!-- ▓▓ ROW 2 — MAP (wide) + RIGHT CARDS ▓▓ -->
+    <div class="row-map">
+
+      <!-- Map card -->
+      <div class="card map-card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Delhi Ward Flood Risk Map</div>
+            <div class="card-sub">Real-time AI flood predictions · click markers for details</div>
+          </div>
+          <div class="legend-row">
+            <span class="ldot red"></span><span class="llabel">High</span>
+            <span class="ldot amber"></span><span class="llabel">Medium</span>
+            <span class="ldot green"></span><span class="llabel">Low</span>
+            <span class="ldot yellow"></span><span class="llabel">Drain Fail</span>
+          </div>
+        </div>
+        <div id="map"></div>
+      </div>
+
+      <!-- Right column: 2 stacked cards -->
+      <div class="right-col">
+
+        <!-- Rainfall input card -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Rainfall Input</div>
+            <div class="range-tag" id="rangeTag">Mar 08–15, 2026</div>
+          </div>
+          <div class="rain-hero">
+            <div class="rain-num" id="rainNum">120</div>
+            <div class="rain-unit">mm</div>
+            <div class="rain-pill" id="rainPill"><span class="rpill-dot moderate"></span><span id="rainCat">Moderate</span></div>
+          </div>
+          <input type="range" id="slider" min="50" max="300" value="120" class="slider"/>
+          <div class="slider-marks"><span>50</span><span>175</span><span>300</span></div>
+          <!-- intensity grid like image -->
+          <div class="intensity-grid" id="intensityGrid"></div>
+          <div class="intensity-days"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+          <button class="btn-analyze" id="analyzeBtn" onclick="runAnalysis()">⚡ &nbsp;Analyze Flood Risk</button>
+        </div>
+
+        <!-- Risk donut + simulation -->
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Risk Distribution</div>
+            <div class="range-tag">All Wards</div>
+          </div>
+          <div class="donut-row">
+            <div class="donut-box"><canvas id="donutChart"></canvas></div>
+            <div class="donut-stats">
+              <div class="ds-row"><span class="ds-dot red"></span><span class="ds-pct" id="dHigh">—%</span><span class="ds-lbl">High Risk</span></div>
+              <div class="ds-row"><span class="ds-dot amber"></span><span class="ds-pct" id="dMed">—%</span><span class="ds-lbl">Medium Risk</span></div>
+              <div class="ds-row"><span class="ds-dot green"></span><span class="ds-pct" id="dLow">—%</span><span class="ds-lbl">Low Risk</span></div>
+            </div>
+          </div>
+          <!-- Flood sim inside this card -->
+          <div class="sim-block">
+            <div class="sim-title">Flood Simulation</div>
+            <button class="btn-sim" id="simBtn" onclick="toggleSim()"><span id="simIcon">▶</span>&nbsp;<span id="simTxt">Start Simulation</span></button>
+            <div class="sim-steps">
+              <div class="sstep" id="ss0"><div class="ss-dot"></div><span>T+0 min &nbsp;· Rain begins</span></div>
+              <div class="sstep" id="ss1"><div class="ss-dot"></div><span>T+30 min · Accumulation</span></div>
+              <div class="sstep" id="ss2"><div class="ss-dot"></div><span>T+60 min · Drains full</span></div>
+              <div class="sstep" id="ss3"><div class="ss-dot"></div><span>T+90 min · Flooding</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ▓▓ ROW 3 — WARD CARDS (3 per row like image bottom) ▓▓ -->
+    <div class="row-head">
+      <div>
+        <div class="section-title">Top Risk Wards</div>
+        <div class="section-sub">AI-predicted flood probability per ward · click to locate on map</div>
+      </div>
+      <div class="filter-row">
+        <button class="fpill active" onclick="setFilter('ALL',this)">All Wards</button>
+        <button class="fpill" onclick="setFilter('HIGH',this)">High Risk</button>
+        <button class="fpill" onclick="setFilter('MEDIUM',this)">Medium</button>
+        <button class="fpill" onclick="setFilter('LOW',this)">Low Risk</button>
+      </div>
+    </div>
+
+    <div class="ward-grid" id="wardGrid">
+      <div class="empty-msg">Click "Analyze Risk" to load ward data</div>
+    </div>
+
+    <!-- ▓▓ ROW 4 — TABLE + TIMELINE ▓▓ -->
+    <div class="row-bottom">
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">Resource Allocation</div>
+            <div class="card-sub">Emergency deployment per ward — auto-assigned by AI</div>
+          </div>
+          <button class="export-btn">Export CSV ↓</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Ward</th><th>Risk</th><th>💧 Pumps</th><th>👥 Teams</th><th>🚤 Boats</th><th>Readiness</th><th>Drain Status</th></tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="7" class="empty-msg">Awaiting analysis…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card tl-card">
+        <div class="card-title">AI Action Timeline</div>
+        <div class="card-sub" style="margin-bottom:14px">Automated emergency response protocol</div>
+        <div id="timelineEl"></div>
+      </div>
+
+    </div><!-- /row-bottom -->
+
+  </div><!-- /page -->
+</div><!-- /main -->
+
+<script src="/static/script.js"></script>
+</body>
+</html>
